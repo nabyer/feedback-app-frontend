@@ -1,24 +1,25 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { createFeedback } from '../api/feedbackApi';
 
-const FeedbackForm = () => {
+const FeedbackForm = ({ onFeedbackAdded }) => {
     const [title, setTitle] = useState('');
-    const [ text, setText ] = useState('');
+    const [text, setText] = useState(''); 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        createFeedback({title, text});
+        await createFeedback({ title, text });
         setTitle('');
         setText('');
+        onFeedbackAdded();
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <h2>Add New Feeedback</h2>
+            <h2>Add New Feedback</h2>
             <input
                 type="text"
                 placeholder="Add Feedback Title Here"
-                value={title}
+                value={title} 
                 onChange={(e) => setTitle(e.target.value)}
                 required
             />
@@ -30,7 +31,7 @@ const FeedbackForm = () => {
                 required
             />
             <br/>
-            <button type="submit">Feedback</button>
+            <button type="submit">Submit Feedback</button>
         </form>
     );
 };

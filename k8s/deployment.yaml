@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feedback-frontend-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: feedback-frontend
+    template:
+      metadata:
+        labels:
+          app: feedback-frontend
+      spec:
+        containers:
+        - name: feedback-frontend
+          image: galaataman/feedback-app-frontend:latest
+          ports:
+          - containerPort: 80
+          env:
+          - name: REACT_APP_BACKEND_HOST
+            value: "feedback-backend-service"
+          - name: REACT_APP_BACKEND_PORT
+            value: "3030"
+          resources:
+            limits:
+             memory: "256Mi"
+             cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"

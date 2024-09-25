@@ -1,26 +1,25 @@
-# Stufe 1: Build-Phase
-FROM node:16-alpine AS builder
+FROM node:22-bookworm-slim AS buildstage
 
-# Arbeitsverzeichnis setzen
-WORKDIR /app
+ARG REACT_APP_BACKEND_HOST
+ARG REACT_APP_BACKEND_PORT
 
-# Kopiere package.json und installiere Abhängigkeiten
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+ENV REACT_APP_BACKEND_HOST=$REACT_APP_BACKEND_HOST
+ENV REACT_APP_BACKEND_PORT=$REACT_APP_BACKEND_PORT
 
-# Kopiere restlichen Quellcode und baue das Projekt
+WORKDIR /usr/src/app
+
+COPY package*.json .
+
+RUN npm install
+
 COPY . .
-RUN yarn build
 
-# Stufe 2: Produktions-Phase
-FROM nginx:alpine
+RUN npm run build
 
-# Entferne den Standard-NGINX-Inhalt und kopiere den Build
-RUN rm -rf /usr/share/nginx/html/*
-COPY --from=builder /app/build /usr/share/nginx/html
+FROM nginx:1.27-bookworm
 
-# Exportiere den Standard-NGINX-Port
+COPY --from=buildstage /usr/src/app/build /usr/share/nginx/html
+
 EXPOSE 80
 
-# Starten von NGINX
 CMD ["nginx", "-g", "daemon off;"]
